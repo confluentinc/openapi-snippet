@@ -101,11 +101,19 @@ const refTestOpenAPI = {
   'paths': {
     '/users/{id}': {
       'get': {
-        'parameters': [{
-          'name': 'email',
-          'in': 'query',
-          'schema': { '$ref': '#/components/schemas/SearchFilter' },
-        }]
+        'parameters': [
+          {
+            'name': 'email',
+            'in': 'query',
+            'schema': { '$ref': '#/components/schemas/SearchFilter' },
+          },
+          {
+            'name': 'created_at',
+            'in': 'query',
+            'schema': { '$ref': '#/components/schemas/DateFilter' },
+            'example': '2019-07-21T17:32:28Z'
+          }
+        ]
       }
     }
   },
@@ -115,6 +123,19 @@ const refTestOpenAPI = {
         'type': 'array',
         'items': {
           'type': 'string'
+        }
+      },
+      'DateFilter': {
+        'type': 'object',
+        'properties': {
+          'after': {
+            'type': 'string',
+            'format': 'date'
+          },
+          'before': {
+            'type': 'string',
+            'format': 'date'
+          }
         }
       }
     }
@@ -128,20 +149,76 @@ test('Referenced query parameters schemas should be resolved [placeholder]', fun
   t.end()
 })
 
-test('Referenced query parameters schemas should be resolved [param example]', function (t) {
+test('Referenced query parameters schemas should be resolved [param example, array, single, explode]', function (t) {
   refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'] = 'marty.mcfly@example.com'
   const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
   const snippet = result.snippets[0].content
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'])
   t.true(/email: 'marty.mcfly@example.com'/.test(snippet))
   t.end()
 })
 
-test('Referenced query parameters schemas should be resolved [schema example]', function (t) {
+test('Referenced query parameters schemas should be resolved [param example, array, multiple, explode]', function (t) {
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'] = ['marty.mcfly@example.com', 'doc.brown@example.com']
+  const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
+  const snippet = result.snippets[0].content
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'])
+  t.true(/email: \['marty.mcfly@example.com', 'doc.brown@example.com'\]/.test(snippet))
+  t.end()
+})
+
+test('Referenced query parameters schemas should be resolved [schema example, array, single, explode]', function (t) {
   refTestOpenAPI['components']['schemas']['SearchFilter']['example'] = 'marty.mcfly@example.com'
   const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
   const snippet = result.snippets[0].content
   delete (refTestOpenAPI['components']['schemas']['SearchFilter']['example'])
   t.true(/email: 'marty.mcfly@example.com'/.test(snippet))
+  t.end()
+})
+
+test('Referenced query parameters schemas should be resolved [schema example, array, multiple, explode]', function (t) {
+  refTestOpenAPI['components']['schemas']['SearchFilter']['example'] = ['marty.mcfly@example.com', 'doc.brown@example.com']
+  const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
+  const snippet = result.snippets[0].content
+  delete (refTestOpenAPI['components']['schemas']['SearchFilter']['example'])
+  t.true(/email: \['marty.mcfly@example.com', 'doc.brown@example.com'\]/.test(snippet))
+  t.end()
+})
+
+test('Referenced query parameters schemas should be resolved [example, array, csv]', function (t) {
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'] = ['marty.mcfly@example.com', 'doc.brown@example.com']
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['explode'] = false
+  const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
+  const snippet = result.snippets[0].content
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'])
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['explode'])
+  t.true(/email: 'marty.mcfly@example.com,doc.brown@example.com'/.test(snippet))
+  t.end()
+})
+
+test('Referenced query parameters schemas should be resolved [example, array, spaceDelimited]', function (t) {
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'] = ['marty.mcfly@example.com', 'doc.brown@example.com']
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['style'] = 'spaceDelimited'
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['explode'] = false
+  const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
+  const snippet = result.snippets[0].content
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'])
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['style'])
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['explode'])
+  t.true(/email: 'marty.mcfly@example.com doc.brown@example.com'/.test(snippet))
+  t.end()
+})
+
+test('Referenced query parameters schemas should be resolved [example, array, pipeDelimited]', function (t) {
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'] = ['marty.mcfly@example.com', 'doc.brown@example.com']
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['style'] = 'pipeDelimited'
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['explode'] = false
+  const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
+  const snippet = result.snippets[0].content
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'])
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['style'])
+  delete (refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['explode'])
+  t.true(/email: 'marty.mcfly@example.com|doc.brown@example.com'/.test(snippet))
   t.end()
 })
 

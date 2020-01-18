@@ -133,6 +133,49 @@ const getBaseUrl = function (openApi) {
  * @return {array}          List of objects describing the query strings
  */
 const getQueryStrings = function (openApi, path, method, values) {
+  const buildArrayQuery = function(name, style, explode, param) {
+    let value = false
+    if (Array.isArray(param.example)) {
+      if (explode === true) {
+        for (let j in param.example) {
+          queryStrings.push({
+            name: name,
+            value: param.example[j]
+          })
+        }
+      } else if (style === 'form') {
+        value = param.example.join(",")
+      } else if (style == 'spaceDelimited') {
+        value = param.example.join(" ")
+      } else if (style == 'pipeDelimited') {
+        value = param.example.join("|")
+      }
+    } else {
+      value = param.example + ''
+    }
+    return value
+  }
+
+  const buildObjectQuery = function() {
+
+  }
+
+  const buildValueQuery = function(name, value, style, explode, param) {
+    if (typeof style === 'undefined') {
+      param.style = 'form'
+    }
+    if (typeof explode === 'undefined') {
+      param.explode = true
+    }
+    if (param.type === 'array' || param.schema.type === 'array') {
+      value = buildArrayQuery(name, style, explode, param)
+    // } else if (paramType === 'object') {
+    } else {
+      value = param.example + ''
+    }
+    return value
+  }
+
   // Set the optional parameter if it's not provided
   if (typeof values === 'undefined') {
     values = {}
@@ -158,18 +201,19 @@ const getQueryStrings = function (openApi, path, method, values) {
         } else if (typeof param.default !== 'undefined') {
           value = param.default + ''
         } else if (typeof param.example !== 'undefined') {
-          value = param.example + ''
+          value = buildValueQuery(param.name, value, param.style, param.explode, param)
         } else if (typeof param.schema !== 'undefined' && typeof param.schema.example !== 'undefined') {
-          value = param.schema.example + ''
+          value = buildValueQuery(param.name, value, param.style, param.explode, param.schema)
         }
-        queryStrings.push({
-          name: param.name,
-          value: value
-        })
+        if (value) {
+          queryStrings.push({
+            name: param.name,
+            value: value
+          })
+        }
       }
     }
   }
-
   return queryStrings
 }
 
