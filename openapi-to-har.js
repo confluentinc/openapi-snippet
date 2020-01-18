@@ -156,8 +156,34 @@ const getQueryStrings = function (openApi, path, method, values) {
     return value
   }
 
-  const buildObjectQuery = function() {
-
+  const buildObjectQuery = function(name, style, explode, param) {
+    let value = false
+    if (typeof param.example === 'object') {
+      if (style === 'form' && explode === true) {
+        for (let k in param.example) {
+          if (param.example.hasOwnProperty(k)) {
+            queryStrings.push({
+              name: k,
+              value: param.example[k]
+            })
+          }
+        }
+      if (style === 'form' && explode === false) {
+        value = []
+        for (let k in param.example) {
+          if (param.example.hasOwnProperty(k)) {
+            value.push(k)
+            value.push(param.example[k])
+          }
+        }
+        value = value.join(',')
+      } else if (style == 'deepObject') {
+        value = param.example.join(" ")
+      }
+    } else {
+      value = param.example + ''
+    }
+    return value
   }
 
   const buildValueQuery = function(name, value, style, explode, param) {
@@ -169,7 +195,8 @@ const getQueryStrings = function (openApi, path, method, values) {
     }
     if (param.type === 'array' || param.schema.type === 'array') {
       value = buildArrayQuery(name, style, explode, param)
-    // } else if (paramType === 'object') {
+    } else if (paramType === 'object') {
+      value = buildObjectQuery(name, style, explode, param)
     } else {
       value = param.example + ''
     }
