@@ -157,6 +157,8 @@ const getQueryStrings = function (openApi, path, method, values) {
           value = values[param.name] + ''  /* adding a empty string to convert to string */
         } else if (typeof param.default !== 'undefined') {
           value = param.default + ''
+        } else if (typeof param.example !== 'undefined') {
+          value = param.example + ''
         } else if (typeof param.schema !== 'undefined' && typeof param.schema.example !== 'undefined') {
           value = param.schema.example + ''
         }

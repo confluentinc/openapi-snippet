@@ -92,42 +92,56 @@ test('Testing the case when default is present but no value is provided, use the
 test('Referenced query parameters should be resolved', function (t) {
   const result = OpenAPISnippets.getEndpointSnippets(WatsonOpenAPI, '/html/HTMLExtractDates', 'get', ['node_request'])
   const snippet = result.snippets[0].content
-  t.true(/apikey/.test(snippet))
-  t.true(/showSourceText/.test(snippet))
+  t.true(/apikey: 'SOME_STRING_VALUE'/.test(snippet))
+  t.true(/showSourceText: 'SOME_INTEGER_VALUE'/.test(snippet))
   t.end()
 })
 
-test('Referenced query parameters schemas should be resolved', function (t) {
-  const openAPI = {
-    'paths': {
-      '/users/{id}': {
-        'get': {
-          'parameters': [{
-            'name': 'email',
-            'in': 'query',
-            'required': false,
-            'schema': { '$ref': '#/components/schemas/SearchFilter' },
-            'example': 'marty.mcfly@example.com',
-            'description': 'Filter the results by a partial search of email.'
-          }]
-        }
+const refTestOpenAPI = {
+  'paths': {
+    '/users/{id}': {
+      'get': {
+        'parameters': [{
+          'name': 'email',
+          'in': 'query',
+          'schema': { '$ref': '#/components/schemas/SearchFilter' },
+        }]
       }
-    },
-    'components': {
-      'schemas': {
-        'SearchFilter': {
-          'description': 'Filter a collection by a string search for one or more values',
-          'type': 'array',
-          'items': {
-            'type': 'string'
-          }
+    }
+  },
+  'components': {
+    'schemas': {
+      'SearchFilter': {
+        'type': 'array',
+        'items': {
+          'type': 'string'
         }
       }
     }
   }
-  const result = OpenAPISnippets.getEndpointSnippets(openAPI, '/users/{id}', 'get', ['node_request'])
+}
+
+test('Referenced query parameters schemas should be resolved [placeholder]', function (t) {
+  const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
   const snippet = result.snippets[0].content
-  t.true(/email/.test(snippet))
+  t.true(/email: 'SOME_ARRAY_VALUE'/.test(snippet))
+  t.end()
+})
+
+test('Referenced query parameters schemas should be resolved [param example]', function (t) {
+  refTestOpenAPI['paths']['/users/{id}']['get']['parameters'][0]['example'] = 'marty.mcfly@example.com'
+  const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
+  const snippet = result.snippets[0].content
+  t.true(/email: 'marty.mcfly@example.com'/.test(snippet))
+  t.end()
+})
+
+test('Referenced query parameters schemas should be resolved [schema example]', function (t) {
+  refTestOpenAPI['components']['schemas']['SearchFilter']['example'] = 'marty.mcfly@example.com'
+  const result = OpenAPISnippets.getEndpointSnippets(refTestOpenAPI, '/users/{id}', 'get', ['node_request'])
+  const snippet = result.snippets[0].content
+  delete (refTestOpenAPI['components']['schemas']['SearchFilter']['example'])
+  t.true(/email: 'marty.mcfly@example.com'/.test(snippet))
   t.end()
 })
 
