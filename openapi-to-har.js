@@ -164,6 +164,14 @@ const getQueryStrings = function (openApi, path, method, values) {
         typeof param.schema['$ref'] === 'string' &&
         /^#/.test(param.schema['$ref'])) {
         param.schema = resolveRef(openApi, param.schema['$ref'])
+      if (typeof param.schema !== 'undefined') {
+        if (typeof param.schema['$ref'] === 'string' &&
+          /^#/.test(param.schema['$ref'])) {
+          param.schema = resolveRef(openApi, param.schema['$ref'])
+          if (typeof param.schema.type === 'undefined') { // many schemas don't have an explicit type
+            param.schema.type = 'object';
+          }
+        }
       }
       if (typeof param.in !== 'undefined' && param.in.toLowerCase() === 'query') {
         let value = 'SOME_' + (param.type || param.schema.type).toUpperCase() + '_VALUE'
