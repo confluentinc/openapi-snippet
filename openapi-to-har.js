@@ -251,32 +251,33 @@ const getQueryStrings = function (openApi, path, method, values) {
         param = resolveRef(openApi, param['$ref']);
       }
       if ('schema' in param &&
-        typeof param.schema['$ref'] === 'string' &&
-        /^#/.test(param.schema['$ref'])) {
-        param.schema = resolveRef(openApi, param.schema['$ref'])
-      if (typeof param.schema !== 'undefined') {
-        if (
           typeof param.schema['$ref'] === 'string' &&
-          /^#/.test(param.schema['$ref'])
-        ) {
-          param.schema = resolveRef(openApi, param.schema['$ref']);
-          if (typeof param.schema.type === 'undefined') {
-            // many schemas don't have an explicit type
-            param.schema.type = 'object';
+          /^#/.test(param.schema['$ref'])) {
+        param.schema = resolveRef(openApi, param.schema['$ref'])
+        if (typeof param.schema !== 'undefined') {
+          if (
+              typeof param.schema['$ref'] === 'string' &&
+              /^#/.test(param.schema['$ref'])
+          ) {
+            param.schema = resolveRef(openApi, param.schema['$ref']);
+            if (typeof param.schema.type === 'undefined') {
+              // many schemas don't have an explicit type
+              param.schema.type = 'object';
+            }
           }
         }
-      }
-      if (
-        typeof param.in !== 'undefined' &&
-        param.in.toLowerCase() === 'query'
-      ) {
-        queryStrings.push(getParameterValues(param, values));
+        if (
+            typeof param.in !== 'undefined' &&
+            param.in.toLowerCase() === 'query'
+        ) {
+          queryStrings.push(getParameterValues(param, values));
+        }
       }
     }
-  }
 
-  return queryStrings;
-};
+    return queryStrings;
+  }
+}
 
 /**
  * Return the path with the parameters example values used if specified.
