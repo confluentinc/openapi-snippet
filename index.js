@@ -154,7 +154,9 @@ const getResourceName = function (urlStr) {
 };
 
 /**
- * 
+ * Decoding the encoded uri received from HTTP Snippet. So that when sample code snippets are  
+ * generated we won't see encoded url.
+ * Eg. ../request/%7Bid%7D --> ../request/{id}
  */
 
 const uriDecodeRequest = function(request) {
