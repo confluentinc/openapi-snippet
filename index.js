@@ -62,7 +62,7 @@ const getEndpointSnippets = function (openApi, path, method, targets, values) {
  * @param {array} targets   List of languages to create snippets in, e.g,
  *                          ['cURL', 'Node']
  */
-const getSnippets = function (openApi, targets) {
+const getSnippets = function (openApi, targets, encodeUri = true) {
   const harList = OpenAPIToHar.getAll(openApi);
 
   const results = [];
@@ -70,6 +70,12 @@ const getSnippets = function (openApi, targets) {
     // create HTTPSnippet object:
     const har = harList[i];
     const snippet = new HTTPSnippet(har.har);
+
+    if (!encodeUri) {
+      snippet.requests.map(request => {
+        return uriDecodeRequest(request);
+      })
+    }
 
     const snippets = [];
     for (let j in targets) {
@@ -146,6 +152,19 @@ const getResourceName = function (urlStr) {
     }
   }
 };
+
+/**
+ * 
+ */
+
+const uriDecodeRequest = function(request) {
+  request.fullUrl = decodeURI(request.fullUrl)
+  request.url = decodeURI(request.url)
+  request.uriObj.path = decodeURI(request.uriObj.path)
+  request.uriObj.pathname = decodeURI(request.uriObj.pathname)
+  request.uriObj.href = decodeURI(request.uriObj.href)
+  return request;
+}
 
 /**
  * Format the given target by splitting up language and library and making sure
