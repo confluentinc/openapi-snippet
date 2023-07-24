@@ -22,7 +22,7 @@ const HTTPSnippet = require('httpsnippet');
  *                          ['cURL', 'Node']
  * @param {object} values   Optional: Values for the query parameters if present
  */
-const getEndpointSnippets = function (openApi, path, method, targets, values) {
+const getEndpointSnippets = function (openApi, path, method, targets, values, encodeUri = true) {
   // if optional parameter is not provided, set it to empty object
   if (typeof values === 'undefined') {
     values = {};
@@ -31,6 +31,12 @@ const getEndpointSnippets = function (openApi, path, method, targets, values) {
   const har = OpenAPIToHar.getEndpoint(openApi, path, method, values);
 
   const snippet = new HTTPSnippet(har);
+
+  if (!encodeUri) {
+    snippet.requests.map(request => {
+      return uriDecodeRequest(request);
+    })
+  }
 
   const snippets = [];
   for (let j in targets) {
