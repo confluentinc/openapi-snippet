@@ -22,7 +22,7 @@ const HTTPSnippet = require('httpsnippet');
  *                          ['cURL', 'Node']
  * @param {object} values   Optional: Values for the query parameters if present
  */
-const getEndpointSnippets = function (openApi, path, method, targets, values) {
+const getEndpointSnippets = function (openApi, path, method, targets, values, encodeUri = true) {
   // if optional parameter is not provided, set it to empty object
   if (typeof values === 'undefined') {
     values = {};
@@ -31,6 +31,12 @@ const getEndpointSnippets = function (openApi, path, method, targets, values) {
   const har = OpenAPIToHar.getEndpoint(openApi, path, method, values);
 
   const snippet = new HTTPSnippet(har);
+
+  if (!encodeUri) {
+    snippet.requests.map(request => {
+      return uriDecodeRequest(request);
+    })
+  }
 
   const snippets = [];
   for (let j in targets) {
@@ -62,7 +68,7 @@ const getEndpointSnippets = function (openApi, path, method, targets, values) {
  * @param {array} targets   List of languages to create snippets in, e.g,
  *                          ['cURL', 'Node']
  */
-const getSnippets = function (openApi, targets) {
+const getSnippets = function (openApi, targets, encodeUri = true) {
   const harList = OpenAPIToHar.getAll(openApi);
 
   const results = [];
@@ -70,6 +76,12 @@ const getSnippets = function (openApi, targets) {
     // create HTTPSnippet object:
     const har = harList[i];
     const snippet = new HTTPSnippet(har.har);
+
+    if (!encodeUri) {
+      snippet.requests.map(request => {
+        return uriDecodeRequest(request);
+      })
+    }
 
     const snippets = [];
     for (let j in targets) {
@@ -146,6 +158,21 @@ const getResourceName = function (urlStr) {
     }
   }
 };
+
+/**
+ * Decoding the encoded uri received from HTTP Snippet. So that when sample code snippets are  
+ * generated we won't see encoded url.
+ * Eg. ../request/%7Bid%7D --> ../request/{id}
+ */
+
+const uriDecodeRequest = function(request) {
+  request.fullUrl = decodeURI(request.fullUrl)
+  request.url = decodeURI(request.url)
+  request.uriObj.path = decodeURI(request.uriObj.path)
+  request.uriObj.pathname = decodeURI(request.uriObj.pathname)
+  request.uriObj.href = decodeURI(request.uriObj.href)
+  return request;
+}
 
 /**
  * Format the given target by splitting up language and library and making sure
