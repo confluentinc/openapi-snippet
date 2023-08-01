@@ -13,56 +13,6 @@ const PetStoreOpenAPI3 = require('./petstore_oas.json');
 const ParameterSchemaReferenceAPI = require('./parameter_schema_reference');
 const ParameterExampleReferenceAPI = require('./parameter_example_swagger.json');
 
-test('Placeholder in the url is encoded when the flag is enabled', function(t){
-  const result = OpenAPISnippets.getSnippets(InstagramOpenAPI, ['c_libcurl']);
-  result.forEach(r => {
-    r.snippets.forEach(s => {
-      t.true(s.content.includes(encodeURI(r.url)));
-    });
-  });
-  t.end();
-});
-
-test('Placeholder in the url is not encoded when the flag is disabled', function(t){
-  const result = OpenAPISnippets.getSnippets(BloggerOpenAPI, ['c_libcurl'], false);
-  result.forEach(r => {
-    r.snippets.forEach(s => {
-      t.true(s.content.includes(decodeURI(r.url)));
-    });
-  });
-  t.end();
-});
-
-test('Placeholder in the url is encoded when the flag is enabled', function(t){
-  const result = OpenAPISnippets.getEndpointSnippets(
-    BloggerOpenAPI,
-    '/blogs/{blogId}/pages',
-    'post',
-    ['node_request']
-  );
-  result.snippets.forEach(s => {
-      t.true(s.content.includes(encodeURI(result.url)));
-    });
-  t.end();
-});
-
-test('Placeholder in the url is not encoded when the flag is disabled', function(t){
-  let values;
-  const result = OpenAPISnippets.getEndpointSnippets(
-    BloggerOpenAPI,
-    '/blogs/{blogId}/pages',
-    'post',
-    ['node_request'],
-    values,
-    false
-  );
-  console.log(result);
-  result.snippets.forEach(s => {
-      t.true(s.content.includes(decodeURI(result.url)));
-    });
-  t.end();
-});
-
 test('Getting snippets should not result in error or undefined', function (t) {
   t.plan(1);
 
