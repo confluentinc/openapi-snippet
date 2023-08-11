@@ -14,7 +14,7 @@ const ParameterSchemaReferenceAPI = require('./parameter_schema_reference');
 const ParameterExampleReferenceAPI = require('./parameter_example_swagger.json');
 const FormUrlencodedExampleAPI = require('./form_urlencoded_example.json');
 
-test('Placeholder in the url is not encoded', function(t){
+test('Getting snippets, Placeholder in the url is not encoded', function(t){
   const result = OpenAPISnippets.getSnippets(BloggerOpenAPI, ['c_libcurl']);
   result.forEach(r => {
     r.snippets.forEach(s => {
@@ -24,7 +24,7 @@ test('Placeholder in the url is not encoded', function(t){
   t.end();
 });
 
-test('Placeholder in the url is not encoded', function(t){
+test('Getting endpoint snippets, Placeholder in the url is not encoded', function(t){
   const result = OpenAPISnippets.getEndpointSnippets(
     BloggerOpenAPI,
     '/blogs/{blogId}/pages',
