@@ -14,6 +14,30 @@ const ParameterSchemaReferenceAPI = require('./parameter_schema_reference');
 const ParameterExampleReferenceAPI = require('./parameter_example_swagger.json');
 const FormUrlencodedExampleAPI = require('./form_urlencoded_example.json');
 
+test('Getting snippets, Placeholder in the url is not encoded', function(t){
+  const result = OpenAPISnippets.getSnippets(BloggerOpenAPI, ['c_libcurl']);
+  result.forEach(r => {
+    r.snippets.forEach(s => {
+      t.true(s.content.includes(decodeURI(r.url)));
+    });
+  });
+  t.end();
+});
+
+test('Getting endpoint snippets, Placeholder in the url is not encoded', function(t){
+  const result = OpenAPISnippets.getEndpointSnippets(
+    BloggerOpenAPI,
+    '/blogs/{blogId}/pages',
+    'post',
+    ['node_request'],
+  );
+  console.log(result);
+  result.snippets.forEach(s => {
+      t.true(s.content.includes(decodeURI(result.url)));
+    });
+  t.end();
+});
+
 test('Getting snippets should not result in error or undefined', function (t) {
   t.plan(1);
 
