@@ -18,7 +18,7 @@ test('Getting snippets, Placeholder in the url is not encoded', function(t){
   const result = OpenAPISnippets.getSnippets(BloggerOpenAPI, ['c_libcurl']);
   result.forEach(r => {
     r.snippets.forEach(s => {
-      t.true(s.content.includes(decodeURI(r.url)));
+      t.true(s.content.includes(decodeURIComponent(r.url)));
     });
   });
   t.end();
@@ -31,9 +31,8 @@ test('Getting endpoint snippets, Placeholder in the url is not encoded', functio
     'post',
     ['node_request'],
   );
-  console.log(result);
   result.snippets.forEach(s => {
-      t.true(s.content.includes(decodeURI(result.url)));
+      t.true(s.content.includes(decodeURIComponent(result.url)));
     });
   t.end();
 });

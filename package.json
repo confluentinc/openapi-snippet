@@ -20,7 +20,7 @@
     "build": "mkdir -p dist && browserify -g uglifyify ./index.js > ./dist/openapisnippet.min.js"
   },
   "dependencies": {
-    "httpsnippet": "github:confluentinc/httpsnippet#4aac3efb07ff2dedf09d0549dc6ba4bc5b5f4ac8",
+    "httpsnippet": "github:confluentinc/httpsnippet#fc88bfc97bd97ac21c20f3472508df333b49a343",
     "openapi-sampler": "^1.0.0-beta.14",
     "openapi-snippet": "^0.14.0"
   },
