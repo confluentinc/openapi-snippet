@@ -27,7 +27,7 @@
     "browserify": "^16.5.1",
     "prettier": "2.8.8",
     "tap-spec": "^5.0.0",
-    "tape": "^4.17.0",
+    "tape": "^5.0.0",
     "uglifyify": "^5.0.2"
   }
 }
