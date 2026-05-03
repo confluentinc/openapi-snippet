@@ -24,7 +24,7 @@
     "openapi-sampler": "^1.0.0-beta.14"
   },
   "devDependencies": {
-    "browserify": "^16.5.1",
+    "browserify": "^17.0.0",
     "prettier": "2.8.8",
     "tap-spec": "^5.0.0",
     "tape": "^4.17.0",
