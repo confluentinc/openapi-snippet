@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "httpsnippet": "^2.0.0",
-    "openapi-sampler": "^1.0.0-beta.14"
+    "openapi-sampler": "^1.7.5"
   },
   "devDependencies": {
     "browserify": "^16.5.1",
